@@ -80,7 +80,9 @@
             <a class="btn btn-link" href="#">
               {{ user.first_name }}({{ user.username }})
             </a>
-            <a class="btn btn-link" href="#"> Logout </a>
+            <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">
+              Logout
+            </a>
             {% else %}
             <input
               id="username"
@@ -97,7 +99,12 @@
               name="password"
             />
             <button class="btn btn-primary me-2" type="submit">Login</button>
-            <a class="btn btn-outline-primary" href="#"> Signup </a>
+            <a
+              class="btn btn-outline-primary"
+              href="{% url 'djangoapp:registration' %}"
+            >
+              Signup
+            </a>
             {% endif %}
           </form>
         </div>

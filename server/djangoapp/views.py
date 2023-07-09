@@ -82,8 +82,6 @@ def registration_request(request):
 
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
-
-
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/a2c9bdd2-c454-4b7d-bb66-97af8efc34cf/default/get-dealership"
@@ -100,6 +98,7 @@ def get_dealer_details(request, dealer_id):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/a2c9bdd2-c454-4b7d-bb66-97af8efc34cf/default/get-review"
         reviews = get_dealer_by_id_from_cf(url, dealer_id)
+        return HttpResponse(reviews)
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...

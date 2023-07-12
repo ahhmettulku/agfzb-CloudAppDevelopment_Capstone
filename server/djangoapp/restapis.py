@@ -80,8 +80,8 @@ def get_dealer_reviews_from_cf(url, dealerId):
                                           text=review_doc["review"]),
                                       id=review_doc["_id"],)
             results.append(review_obj)
-    # for result in results:
-    #     print(result)
+    for result in results:
+        print("RESULT: ", result.sentiment)
     return results
 
 
@@ -107,11 +107,11 @@ def analyze_review_sentiments(text):
     natural_language_understanding.set_service_url(url)
 
     response = natural_language_understanding.analyze(
-        text="The staff was great. The receptionists were very helpful and answered all our questions. The room was clean and bright, and the room service was always on time. Will be coming back! Thank you so much.",
+        text=text,
         features=Features(
             entities=EntitiesOptions(sentiment=True))).get_result()
 
-    # print("RESPONSE:  "+json.dumps(response))
+    print("RESPONSE:  "+json.dumps(response))
     # print(response["entities"])
 
     for key, val in enumerate(response["entities"]):

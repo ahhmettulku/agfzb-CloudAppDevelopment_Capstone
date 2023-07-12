@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-from .restapis import get_dealer_by_id_from_cf, get_dealers_from_cf
+from .restapis import get_dealer_reviews_from_cf, get_dealers_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -97,8 +97,15 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/a2c9bdd2-c454-4b7d-bb66-97af8efc34cf/default/get-review"
-        reviews = get_dealer_by_id_from_cf(url, dealer_id)
+        reviews = get_dealer_reviews_from_cf(url, dealer_id)
         return HttpResponse(reviews)
+
+
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    if (request.user.is_authenticated()):
+        review = dict()
+        review["time"] = datetime.utcnow().isoformat()
+
+    else:
+        return ("User is not authenticated")

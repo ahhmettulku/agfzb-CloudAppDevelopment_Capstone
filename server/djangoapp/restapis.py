@@ -2,11 +2,15 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-
+from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson import NaturalLanguageUnderstandingV1
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
+
+
 def get_request(url, api_key=None, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
@@ -30,6 +34,8 @@ def get_request(url, api_key=None, **kwargs):
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
+def post_request(url, json_payload, **kwargs):
+    requests.post(url, params=kwargs, json=json_payload)
 
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -54,7 +60,7 @@ def get_dealers_from_cf(url, **kwargs):
 
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
-def get_dealer_by_id_from_cf(url, dealerId):
+def get_dealer_reviews_from_cf(url, dealerId):
     results = []
 
     # - Call get_request() with specified arguments
@@ -65,8 +71,7 @@ def get_dealer_by_id_from_cf(url, dealerId):
         reviews = json_result["data"]["docs"]
 
         for review_doc in reviews:
-            # review_doc = review["doc"]
-
+            # print(review_doc)
             review_obj = DealerReview(dealership=review_doc["dealership"], name=review_doc["name"],
                                       purchase=review_doc["purchase"], review=review_doc["review"],
                                       purchase_date=review_doc["purchase_date"], car_make=review_doc["car_make"],
@@ -75,7 +80,8 @@ def get_dealer_by_id_from_cf(url, dealerId):
                                           text=review_doc["review"]),
                                       id=review_doc["_id"],)
             results.append(review_obj)
-
+    # for result in results:
+    #     print(result)
     return results
 
 
@@ -83,12 +89,32 @@ def get_dealer_by_id_from_cf(url, dealerId):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-def analyze_review_sentiments(**kwargs):
+def analyze_review_sentiments(text):
     api_key = "SUWdXfgU_mYmw6PnnjBOPowbbusMkReRx2c4O0H70PoC"
     url = "https://api.eu-gb.natural-language-understanding.watson.cloud.ibm.com/instances/e886639e-c0e9-499e-a9c1-4de6616359cb"
-    params = dict()
-    params["text"] = kwargs["text"]
-    params["version"] = kwargs["version"]
-    params["features"] = kwargs["features"]
-    params["return_analyzed_text"] = kwargs["return_analyzed_text"]
-    response = get_request(url, api_key, params)
+    # params = dict()
+    # params["text"] = kwargs["text"]
+    # params["version"] = kwargs["version"]
+    # params["features"] = kwargs["features"]
+    # params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+    # response = get_request(url=url, api_key=api_key, kwargs=params)
+
+    authenticator = IAMAuthenticator(api_key)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2022-04-07',
+        authenticator=authenticator)
+
+    natural_language_understanding.set_service_url(url)
+
+    response = natural_language_understanding.analyze(
+        text="The staff was great. The receptionists were very helpful and answered all our questions. The room was clean and bright, and the room service was always on time. Will be coming back! Thank you so much.",
+        features=Features(
+            entities=EntitiesOptions(sentiment=True))).get_result()
+
+    # print("RESPONSE:  "+json.dumps(response))
+    # print(response["entities"])
+
+    for key, val in enumerate(response["entities"]):
+        # print(key, ",", val)
+        print(val["sentiment"]["label"])
+        return (val["sentiment"]["label"])

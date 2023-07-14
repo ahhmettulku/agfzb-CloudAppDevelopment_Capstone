@@ -1,5 +1,7 @@
 {% extends "base.html" %} {% block content %} {% if user.is_authenticated %}
-<a href="">Add Review</a>
+<a href="{% url 'djangoapp:add_review' dealer_id%}" class="btn btn-primary my-3"
+  >Add Review</a
+>
 {% endif %}
 <div class="card-group">
   <div class="row g-3">

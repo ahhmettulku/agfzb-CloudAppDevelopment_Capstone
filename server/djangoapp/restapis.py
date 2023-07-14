@@ -14,6 +14,7 @@ from ibm_watson import NaturalLanguageUnderstandingV1
 def get_request(url, api_key=None, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
+    print("GET REQUEST KWARGS********: ", kwargs)
     if (api_key):
         try:
             # Call get method of requests library with URL and parameters
@@ -42,7 +43,11 @@ def post_request(url, json_payload, **kwargs):
 def get_dealers_from_cf(url, **kwargs):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url)
+    print("KWARGS-------", kwargs)
+    if (kwargs):
+        json_result = get_request(url, dealer_id=kwargs["dealer_id"])
+    else:
+        json_result = get_request(url)
     if json_result:
         # Get the row list in JSON as dealers
         dealers = json_result["result"]["docs"]
